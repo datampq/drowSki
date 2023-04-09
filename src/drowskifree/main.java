@@ -18,7 +18,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +29,7 @@ import java.io.ObjectOutputStream;
 
 import java.util.LinkedList;
 
-import javafx.scene.shape.Circle;
+
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
@@ -65,8 +65,8 @@ public final class main extends JFrame {
     
     public main() {
         loadScore();
-        graphicsData = new LinkedList();
-        bgs = new LinkedList();
+        graphicsData = new LinkedList<>();
+        bgs = new LinkedList<>();
         main = this;
         if (loadAssets()) {
             rescaleAssets();
@@ -206,9 +206,9 @@ public final class main extends JFrame {
          * @param data
          */
         public game(LinkedList<tileData> data) {
-            tiles = new LinkedList();
-            backs = new LinkedList();
-            baseData = new LinkedList();
+            tiles = new LinkedList<>();
+            backs = new LinkedList<>();
+            baseData = new LinkedList<>();
             
             if (!digestSquares(data)) {
                 System.out.println("Unable to digest squares!");
@@ -398,6 +398,37 @@ public final class main extends JFrame {
             int diffAmount = 0;
             int exponent = 10;
             Polygon p;
+            //replace the javafx circle with this:
+            public class Circle{
+                int x;
+                int y;
+                int radius;
+                public void setCenterX(int x){
+                    this.x = x;
+                }
+                public void setCenterY(int y){
+                    this.y = y;
+                }
+                public void setRadius(int radius){
+                    this.radius = radius;
+                }
+                public boolean intersects(Rectangle2D r){
+                    double x1 = r.getX();
+                    double y1 = r.getY();
+                    double x2 = r.getX() + r.getWidth();
+                    double y2 = r.getY() + r.getHeight();
+                    return intersects(x1, y1) || intersects(x1, y2) || intersects(x2, y1) || intersects(x2, y2);
+                }
+                public boolean intersects(double x, double y){
+                    double dx = x - this.x;
+                    double dy = y - this.y;
+                    return dx * dx + dy * dy <= radius * radius;
+                }
+
+                public Rectangle2D getBoundsInLocal() {
+                    return new Rectangle2D.Double(x - radius, y - radius, radius * 2, radius * 2);
+                }
+            }
             
             private boolean collisionDebug(tile get) {
                 int x1 = originx * 2 - get.x;
